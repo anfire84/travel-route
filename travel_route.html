@@ -8,48 +8,120 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Malgun Gothic', sans-serif; background: #f0f2f5; }
+
         .header { background: #FEE500; padding: 16px 24px; text-align: center; }
         .header h1 { font-size: 22px; color: #333; }
         .header p { font-size: 13px; color: #666; margin-top: 4px; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; display: flex; gap: 20px; }
-        .sidebar { width: 320px; flex-shrink: 0; }
-        .card { background: white; border-radius: 12px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .card h3 { font-size: 15px; color: #333; margin-bottom: 10px; }
+
+        .container { max-width: 1280px; margin: 20px auto; padding: 0 20px; display: flex; gap: 20px; }
+        .sidebar { width: 350px; flex-shrink: 0; }
+
+        .tabs { display: flex; gap: 2px; }
+        .tab-btn {
+            flex: 1; padding: 10px 6px; border: none; background: #ddd;
+            cursor: pointer; font-size: 13px; font-family: inherit;
+            border-radius: 8px 8px 0 0; color: #666; transition: background 0.2s;
+        }
+        .tab-btn.active { background: white; color: #333; font-weight: bold; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .card {
+            background: white; border-radius: 0 0 12px 12px;
+            padding: 18px; margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card-box {
+            background: white; border-radius: 12px;
+            padding: 16px; margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h3, .card-box h3 { font-size: 15px; color: #333; margin-bottom: 10px; }
         .hint { font-size: 12px; color: #999; margin-bottom: 8px; }
+
         textarea {
-            width: 100%; height: 200px;
+            width: 100%; height: 180px;
             border: 1px solid #ddd; border-radius: 8px;
             padding: 10px; font-size: 14px; font-family: inherit;
             resize: vertical; outline: none;
         }
         textarea:focus { border-color: #FEE500; }
-        button {
+
+        .btn-primary {
             width: 100%; padding: 13px;
             background: #FEE500; border: none; border-radius: 8px;
             font-size: 15px; font-weight: bold; cursor: pointer; color: #333;
-            margin-top: 10px; transition: background 0.2s;
+            margin-top: 10px; transition: background 0.2s; font-family: inherit;
         }
-        button:hover { background: #f0d800; }
-        button:disabled { background: #ddd; cursor: not-allowed; color: #999; }
+        .btn-primary:hover { background: #f0d800; }
+        .btn-primary:disabled { background: #ddd; cursor: not-allowed; color: #999; }
+
+        .btn-secondary {
+            width: 100%; padding: 10px;
+            background: #f5f5f5; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 14px; cursor: pointer; color: #333;
+            margin-top: 8px; transition: background 0.2s; font-family: inherit;
+        }
+        .btn-secondary:hover { background: #eee; }
+
         #status { font-size: 13px; color: #888; margin-top: 8px; min-height: 18px; }
-        #map { flex: 1; border-radius: 12px; min-height: 600px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        #result-card { display: none; }
+        .error-msg { font-size: 12px; color: #e74c3c; margin-top: 6px; }
+
+        #map { flex: 1; border-radius: 12px; min-height: 620px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
         .route-list { list-style: none; }
-        .route-item {
-            display: flex; align-items: center;
-            padding: 9px 0; border-bottom: 1px solid #f0f0f0;
-        }
+        .route-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
         .route-item:last-child { border-bottom: none; }
         .route-num {
-            width: 26px; height: 26px;
-            background: #FEE500; border-radius: 50%;
+            width: 26px; height: 26px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: bold; font-size: 12px;
             margin-right: 10px; flex-shrink: 0;
         }
         .route-name { font-size: 14px; color: #333; }
-        .arrow { color: #ccc; font-size: 11px; margin: 2px 0 2px 36px; }
-        .error-msg { font-size: 12px; color: #e74c3c; margin-top: 6px; }
+        .arrow { color: #ccc; font-size: 11px; margin: 3px 0 3px 36px; display: flex; align-items: center; gap: 6px; }
+        .arrow-time { color: #FF6B6B; font-size: 11px; font-weight: bold; }
+
+        .total-time {
+            margin-top: 10px; padding: 10px;
+            background: #FFF9E6; border-radius: 8px;
+            font-size: 14px; text-align: center; color: #333; font-weight: bold;
+        }
+
+        /* Saved routes */
+        .saved-item {
+            border: 2px solid #eee; border-radius: 10px;
+            padding: 12px; margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        .saved-item.sel-red { border-color: #FF6B6B; background: #FFF8F8; }
+        .saved-item.sel-blue { border-color: #4A90E2; background: #F5F9FF; }
+        .saved-item-name { font-size: 14px; font-weight: bold; color: #333; }
+        .saved-item-meta { font-size: 12px; color: #999; margin-top: 3px; }
+        .saved-item-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+
+        .btn-sm {
+            padding: 5px 9px; border: none; border-radius: 6px;
+            font-size: 12px; cursor: pointer; font-family: inherit; white-space: nowrap;
+        }
+        .btn-sm-yellow { background: #FEE500; color: #333; }
+        .btn-sm-red { background: #FF6B6B; color: white; }
+        .btn-sm-blue { background: #4A90E2; color: white; }
+        .btn-sm-gray { background: #f0f0f0; color: #888; }
+
+        /* Compare */
+        .compare-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        .compare-block {
+            border-radius: 10px; padding: 12px; margin-top: 10px;
+        }
+        .compare-block.red-block { border-left: 4px solid #FF6B6B; background: #FFF8F8; }
+        .compare-block.blue-block { border-left: 4px solid #4A90E2; background: #F5F9FF; }
+        .compare-block-title { font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+
+        .empty-msg { text-align: center; color: #bbb; font-size: 13px; padding: 24px 0; }
+
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .sidebar { width: 100%; }
@@ -61,28 +133,57 @@
 
 <div class="header">
     <h1>여행 경로 최적화</h1>
-    <p>장소 목록을 입력하면 최적의 방문 순서를 알려드려요</p>
+    <p>장소 목록을 입력하면 최적의 방문 순서와 소요시간을 알려드려요</p>
 </div>
 
 <div class="container">
     <div class="sidebar">
-        <div class="card">
-            <h3>여행 장소 입력</h3>
-            <p class="hint">한 줄에 하나씩 입력하세요 (2개 이상)</p>
-            <textarea id="places" placeholder="예시:
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('calculate')">경로 계산</button>
+            <button class="tab-btn" onclick="switchTab('saved')">저장된 경로</button>
+            <button class="tab-btn" onclick="switchTab('compare')">경로 비교</button>
+        </div>
+
+        <!-- 경로 계산 탭 -->
+        <div id="tab-calculate" class="tab-content active">
+            <div class="card">
+                <h3>여행 장소 입력</h3>
+                <p class="hint">한 줄에 하나씩 입력하세요 (2개 이상)</p>
+                <textarea id="places" placeholder="예시:
 경복궁
 남산타워
 홍대입구
 강남역
 코엑스"></textarea>
-            <button id="btn" onclick="optimize()">최적 경로 계산하기</button>
-            <p id="status"></p>
-            <p id="error" class="error-msg"></p>
+                <button class="btn-primary" id="btn" onclick="optimize()">최적 경로 계산하기</button>
+                <p id="status"></p>
+                <p id="error" class="error-msg"></p>
+            </div>
+
+            <div class="card-box" id="result-card" style="display:none;">
+                <h3>최적 방문 순서</h3>
+                <ul id="route-list" class="route-list"></ul>
+                <div id="total-time" class="total-time"></div>
+                <button class="btn-secondary" onclick="promptSave()">이 경로 저장하기</button>
+            </div>
         </div>
 
-        <div class="card" id="result-card">
-            <h3>최적 방문 순서</h3>
-            <ul id="route-list" class="route-list"></ul>
+        <!-- 저장된 경로 탭 -->
+        <div id="tab-saved" class="tab-content">
+            <div class="card">
+                <h3>저장된 경로</h3>
+                <p class="hint">빨강/파랑으로 선택하면 경로 비교 탭에서 비교할 수 있어요</p>
+                <div id="saved-list"></div>
+            </div>
+        </div>
+
+        <!-- 경로 비교 탭 -->
+        <div id="tab-compare" class="tab-content">
+            <div class="card">
+                <h3>경로 비교</h3>
+                <div id="compare-legend" style="font-size:13px;color:#999;">저장된 경로 탭에서 빨강/파랑 선택 후 비교하세요</div>
+                <div id="compare-content"></div>
+            </div>
         </div>
     </div>
 
@@ -94,26 +195,29 @@
         center: new kakao.maps.LatLng(37.5665, 126.9780),
         level: 8
     });
-
-    var markers = [];
-    var overlays = [];
-    var polyline = null;
+    var markers = [], overlays = [], polylines = [];
     var ps = new kakao.maps.services.Places();
+    var currentResult = null;
+    var compareRoutes = { red: null, blue: null };
 
-    function setStatus(msg) {
-        document.getElementById('status').textContent = msg;
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active', ['calculate','saved','compare'][i] === tab);
+        });
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + tab).classList.add('active');
+        if (tab === 'saved') renderSavedList();
+        if (tab === 'compare') renderCompare();
     }
 
-    function setError(msg) {
-        document.getElementById('error').textContent = msg;
-    }
+    function setStatus(msg) { document.getElementById('status').textContent = msg; }
+    function setError(msg) { document.getElementById('error').textContent = msg; }
 
     function clearMap() {
         markers.forEach(m => m.setMap(null));
         overlays.forEach(o => o.setMap(null));
-        markers = [];
-        overlays = [];
-        if (polyline) { polyline.setMap(null); polyline = null; }
+        polylines.forEach(p => p.setMap(null));
+        markers = []; overlays = []; polylines = [];
     }
 
     function searchPlace(name) {
@@ -128,27 +232,27 @@
         });
     }
 
-    function distance(a, b) {
-        const R = 6371;
-        const dLat = (b.lat - a.lat) * Math.PI / 180;
-        const dLng = (b.lng - a.lng) * Math.PI / 180;
-        const x = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(a.lat * Math.PI/180) * Math.cos(b.lat * Math.PI/180) *
-                  Math.sin(dLng/2) * Math.sin(dLng/2);
-        return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+    async function getTravelMatrix(places) {
+        const coords = places.map(p => p.lng + ',' + p.lat).join(';');
+        const url = 'https://router.project-osrm.org/table/v1/driving/' + coords + '?annotations=duration';
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.code !== 'Ok') throw new Error('OSRM error');
+        return data.durations;
     }
 
-    function nearestNeighbor(places) {
-        const visited = new Array(places.length).fill(false);
+    function nearestNeighborMatrix(matrix) {
+        const n = matrix.length;
+        const visited = new Array(n).fill(false);
         const route = [0];
         visited[0] = true;
-        for (let i = 1; i < places.length; i++) {
+        for (let i = 1; i < n; i++) {
             const last = route[route.length - 1];
-            let nearest = -1, minDist = Infinity;
-            for (let j = 0; j < places.length; j++) {
-                if (!visited[j]) {
-                    const d = distance(places[last], places[j]);
-                    if (d < minDist) { minDist = d; nearest = j; }
+            let nearest = -1, minT = Infinity;
+            for (let j = 0; j < n; j++) {
+                if (!visited[j] && matrix[last][j] < minT) {
+                    minT = matrix[last][j];
+                    nearest = j;
                 }
             }
             visited[nearest] = true;
@@ -157,12 +261,35 @@
         return route;
     }
 
+    function nearestNeighborStraight(places) {
+        function dist(a, b) {
+            const R = 6371, dLat = (b.lat-a.lat)*Math.PI/180, dLng = (b.lng-a.lng)*Math.PI/180;
+            const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+            return R*2*Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+        }
+        const visited = new Array(places.length).fill(false);
+        const route = [0]; visited[0] = true;
+        for (let i = 1; i < places.length; i++) {
+            const last = route[route.length-1];
+            let nearest = -1, minD = Infinity;
+            for (let j = 0; j < places.length; j++) {
+                if (!visited[j]) { const d = dist(places[last], places[j]); if (d < minD) { minD = d; nearest = j; } }
+            }
+            visited[nearest] = true; route.push(nearest);
+        }
+        return route;
+    }
+
+    function formatTime(sec) {
+        if (sec === null || sec === undefined) return '-';
+        const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+        return h > 0 ? h + '시간 ' + m + '분' : m + '분';
+    }
+
     async function optimize() {
         const input = document.getElementById('places').value.trim();
         setError('');
-
         if (!input) { setError('장소를 입력해주세요.'); return; }
-
         const names = input.split('\n').map(s => s.trim()).filter(s => s);
         if (names.length < 2) { setError('장소를 2개 이상 입력해주세요.'); return; }
 
@@ -171,72 +298,197 @@
         clearMap();
         document.getElementById('result-card').style.display = 'none';
 
-        const places = [];
-        const failed = [];
-
+        const places = [], failed = [];
         for (let i = 0; i < names.length; i++) {
-            setStatus(`장소 검색 중... (${i+1}/${names.length})`);
-            try {
-                const p = await searchPlace(names[i]);
-                places.push(p);
-            } catch(e) {
-                failed.push(names[i]);
-            }
+            setStatus('장소 검색 중... (' + (i+1) + '/' + names.length + ')');
+            try { places.push(await searchPlace(names[i])); }
+            catch(e) { failed.push(names[i]); }
+        }
+        if (failed.length > 0) setError('찾을 수 없는 장소: ' + failed.join(', '));
+        if (places.length < 2) { setStatus(''); btn.disabled = false; return; }
+
+        let order, matrix = null;
+        try {
+            setStatus('실제 도로 기반 경로 분석 중...');
+            matrix = await getTravelMatrix(places);
+            order = nearestNeighborMatrix(matrix);
+        } catch(e) {
+            setStatus('직선 거리 기반 계산 중...');
+            order = nearestNeighborStraight(places);
         }
 
-        if (failed.length > 0) {
-            setError(`찾을 수 없는 장소: ${failed.join(', ')}`);
-        }
-
-        if (places.length < 2) {
-            setStatus('');
-            btn.disabled = false;
-            return;
-        }
-
-        const order = nearestNeighbor(places);
         const sorted = order.map(i => places[i]);
+        const segmentTimes = [];
+        let totalSeconds = 0;
+        for (let i = 0; i < sorted.length - 1; i++) {
+            const t = matrix ? matrix[order[i]][order[i+1]] : null;
+            segmentTimes.push(t);
+            if (t !== null && t !== undefined) totalSeconds += t;
+        }
 
-        // 마커 + 번호 표시
-        sorted.forEach((p, idx) => {
+        currentResult = { places: sorted, segmentTimes, totalSeconds };
+        drawRoute(sorted, '#FF6B6B', '#FEE500', '#333');
+        renderRouteList('route-list', sorted, segmentTimes, '#FEE500', '#333');
+        document.getElementById('total-time').textContent = '총 이동시간 (자동차): ' + formatTime(totalSeconds);
+        document.getElementById('result-card').style.display = 'block';
+        setStatus('완료! ' + sorted.length + '개 장소 최적 경로');
+        btn.disabled = false;
+    }
+
+    function drawRoute(places, lineColor, markerBg, markerText) {
+        const path = places.map(p => new kakao.maps.LatLng(p.lat, p.lng));
+        places.forEach((p, idx) => {
             const pos = new kakao.maps.LatLng(p.lat, p.lng);
-            const marker = new kakao.maps.Marker({ position: pos, map });
-            const overlay = new kakao.maps.CustomOverlay({
+            markers.push(new kakao.maps.Marker({ position: pos, map }));
+            overlays.push(new kakao.maps.CustomOverlay({
                 position: pos,
-                content: `<div style="background:#FEE500;border:2px solid #333;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;margin-top:-60px;margin-left:6px;box-shadow:0 2px 4px rgba(0,0,0,0.3);">${idx+1}</div>`,
+                content: '<div style="background:' + markerBg + ';border:2px solid #333;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;color:' + markerText + ';margin-top:-60px;margin-left:6px;box-shadow:0 2px 4px rgba(0,0,0,0.3);">' + (idx+1) + '</div>',
                 map
-            });
-            markers.push(marker);
-            overlays.push(overlay);
+            }));
         });
-
-        // 경로선
-        const path = sorted.map(p => new kakao.maps.LatLng(p.lat, p.lng));
-        polyline = new kakao.maps.Polyline({
-            path,
-            strokeWeight: 4,
-            strokeColor: '#FF6B6B',
-            strokeOpacity: 0.8,
-            strokeStyle: 'solid',
-            map
-        });
-
-        // 지도 범위 자동 조정
+        polylines.push(new kakao.maps.Polyline({
+            path, strokeWeight: 4, strokeColor: lineColor,
+            strokeOpacity: 0.8, strokeStyle: 'solid', map
+        }));
         const bounds = new kakao.maps.LatLngBounds();
         path.forEach(p => bounds.extend(p));
         map.setBounds(bounds);
-
-        // 결과 리스트
-        const list = document.getElementById('route-list');
-        list.innerHTML = sorted.map((p, i) => {
-            const arrow = i < sorted.length - 1 ? `<div class="arrow">↓</div>` : '';
-            return `<li class="route-item"><span class="route-num">${i+1}</span><span class="route-name">${p.name}</span></li>${arrow}`;
-        }).join('');
-        document.getElementById('result-card').style.display = 'block';
-
-        setStatus(`완료! ${sorted.length}개 장소 최적 경로`);
-        btn.disabled = false;
     }
+
+    function renderRouteList(listId, places, segmentTimes, numBg, numText) {
+        const list = document.getElementById(listId);
+        if (!list) return;
+        list.innerHTML = places.map((p, i) => {
+            const arrow = i < places.length - 1
+                ? '<div class="arrow">↓ <span class="arrow-time">🚗 ' + formatTime(segmentTimes[i]) + '</span></div>'
+                : '';
+            return '<li class="route-item"><span class="route-num" style="background:' + numBg + ';color:' + numText + '">' + (i+1) + '</span><span class="route-name">' + p.name + '</span></li>' + arrow;
+        }).join('');
+    }
+
+    // 저장/불러오기
+    function getSavedRoutes() {
+        return JSON.parse(localStorage.getItem('travelRoutes') || '[]');
+    }
+    function setSavedRoutes(routes) {
+        localStorage.setItem('travelRoutes', JSON.stringify(routes));
+    }
+
+    function promptSave() {
+        if (!currentResult) return;
+        const name = prompt('경로 이름을 입력하세요:', '여행 ' + new Date().toLocaleDateString('ko-KR'));
+        if (!name) return;
+        const routes = getSavedRoutes();
+        routes.push({
+            id: Date.now(),
+            name,
+            date: new Date().toLocaleDateString('ko-KR'),
+            places: currentResult.places,
+            segmentTimes: currentResult.segmentTimes,
+            totalSeconds: currentResult.totalSeconds
+        });
+        setSavedRoutes(routes);
+        alert('저장되었습니다!');
+    }
+
+    function renderSavedList() {
+        const routes = getSavedRoutes();
+        const container = document.getElementById('saved-list');
+        if (routes.length === 0) {
+            container.innerHTML = '<p class="empty-msg">저장된 경로가 없어요<br>경로 계산 후 저장해보세요</p>';
+            return;
+        }
+        container.innerHTML = routes.map((r, idx) => {
+            const isRed = compareRoutes.red && compareRoutes.red.id === r.id;
+            const isBlue = compareRoutes.blue && compareRoutes.blue.id === r.id;
+            const cls = isRed ? 'sel-red' : isBlue ? 'sel-blue' : '';
+            return '<div class="saved-item ' + cls + '">' +
+                '<div class="saved-item-name">' + r.name + '</div>' +
+                '<div class="saved-item-meta">' + r.date + ' · ' + r.places.length + '개 장소 · 🚗 ' + formatTime(r.totalSeconds) + '</div>' +
+                '<div class="saved-item-actions">' +
+                '<button class="btn-sm btn-sm-yellow" onclick="viewSaved(' + idx + ')">지도 보기</button>' +
+                '<button class="btn-sm btn-sm-red" onclick="selectCompare(' + idx + ',\'red\')">빨강 선택</button>' +
+                '<button class="btn-sm btn-sm-blue" onclick="selectCompare(' + idx + ',\'blue\')">파랑 선택</button>' +
+                '<button class="btn-sm btn-sm-gray" onclick="deleteSaved(' + idx + ')">삭제</button>' +
+                '</div></div>';
+        }).join('');
+    }
+
+    function viewSaved(idx) {
+        const routes = getSavedRoutes();
+        const r = routes[idx];
+        clearMap();
+        drawRoute(r.places, '#FF6B6B', '#FEE500', '#333');
+        switchTab('calculate');
+        renderRouteList('route-list', r.places, r.segmentTimes, '#FEE500', '#333');
+        document.getElementById('total-time').textContent = '총 이동시간 (자동차): ' + formatTime(r.totalSeconds);
+        document.getElementById('result-card').style.display = 'block';
+        currentResult = r;
+    }
+
+    function deleteSaved(idx) {
+        if (!confirm('삭제하시겠어요?')) return;
+        const routes = getSavedRoutes();
+        const deletedId = routes[idx].id;
+        routes.splice(idx, 1);
+        setSavedRoutes(routes);
+        if (compareRoutes.red && compareRoutes.red.id === deletedId) compareRoutes.red = null;
+        if (compareRoutes.blue && compareRoutes.blue.id === deletedId) compareRoutes.blue = null;
+        renderSavedList();
+    }
+
+    function selectCompare(idx, color) {
+        const routes = getSavedRoutes();
+        compareRoutes[color] = routes[idx];
+        renderSavedList();
+        if (compareRoutes.red && compareRoutes.blue) {
+            switchTab('compare');
+        }
+    }
+
+    function renderCompare() {
+        const legend = document.getElementById('compare-legend');
+        const content = document.getElementById('compare-content');
+        const red = compareRoutes.red, blue = compareRoutes.blue;
+
+        if (!red && !blue) {
+            legend.textContent = '저장된 경로 탭에서 빨강/파랑 선택 후 비교하세요';
+            content.innerHTML = '';
+            return;
+        }
+
+        let legendHtml = '<div class="compare-legend">';
+        if (red) legendHtml += '<div><span class="legend-dot" style="background:#FF6B6B"></span>' + red.name + '</div>';
+        if (blue) legendHtml += '<div><span class="legend-dot" style="background:#4A90E2"></span>' + blue.name + '</div>';
+        legendHtml += '</div>';
+        legend.innerHTML = legendHtml;
+
+        let html = '';
+        if (red) {
+            html += '<div class="compare-block red-block"><div class="compare-block-title" style="color:#FF6B6B">' + red.name + '</div>';
+            html += '<ul class="route-list" id="cmp-red"></ul>';
+            html += '<div class="total-time" style="background:#FFF0F0">총 이동시간: ' + formatTime(red.totalSeconds) + '</div></div>';
+        }
+        if (blue) {
+            html += '<div class="compare-block blue-block"><div class="compare-block-title" style="color:#4A90E2">' + blue.name + '</div>';
+            html += '<ul class="route-list" id="cmp-blue"></ul>';
+            html += '<div class="total-time" style="background:#EFF5FF">총 이동시간: ' + formatTime(blue.totalSeconds) + '</div></div>';
+        }
+        content.innerHTML = html;
+
+        if (red) renderRouteList('cmp-red', red.places, red.segmentTimes, '#FF6B6B', 'white');
+        if (blue) renderRouteList('cmp-blue', blue.places, blue.segmentTimes, '#4A90E2', 'white');
+
+        // 지도에 두 경로 표시
+        clearMap();
+        if (red) drawRoute(red.places, '#FF6B6B', '#FF6B6B', 'white');
+        if (blue) drawRoute(blue.places, '#4A90E2', '#4A90E2', 'white');
+    }
+</script>
+
+</body>
+</html>
+
 </script>
 
 </body>
